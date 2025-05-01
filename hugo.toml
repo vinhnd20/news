@@ -1,5 +1,5 @@
-baseURL = 'https://vinhd.shop/'
-languageCode = 'en-us'
+baseURL = "https://fastcoin.click/"
+languageCode = 'vi'
 title = 'Tin Tức 24h'
 theme = "hugo-news"
 
@@ -37,12 +37,12 @@ googleAnalytics = "" # e.g. "G-MEASUREMENT_ID"
   home = ["HTML", "RSS", "JSON"]
 
 [[menus.main]]
-name = "Home"
+name = "Trang chủ"
 url = "/"
 weight = 10
 
 [[menus.main]]
-name = "Categories"
+name = "Phân loại"
 url = "/categories"
 weight = 20
 

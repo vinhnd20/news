@@ -1,4 +1,4 @@
 ---
-title: Categories
-description: Browse news articles by category
+title: Phân loại
+description: Các bài tin được phân loại
 --- 

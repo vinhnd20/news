@@ -24,7 +24,7 @@
                     <span>{{ .Date.Format "January 2, 2006" }}</span>
                 </div>
                 <p class="text-gray-700 mb-4">{{ .Description | default (.Summary | truncate 200) }}</p>
-                <a href="{{ .RelPermalink }}" class="inline-block bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">Read More</a>
+                <a href="{{ .RelPermalink }}" class="inline-block bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">Đọc thêm</a>
             </div>
         </div>
     </article>
@@ -32,7 +32,7 @@
 
     <!-- Recent Articles Grid -->
     <div class="mb-12">
-        <h2 class="text-3xl font-bold mb-8">Recent Articles</h2>
+        <h2 class="text-3xl font-bold mb-8">Bài viết gần đây</h2>
         <div class="grid gap-8 md:grid-cols-3">
             {{ range first 6 (after 1 (where .Site.RegularPages "Type" "articles")) }}
             <article class="bg-white rounded-lg shadow-md overflow-hidden">
@@ -63,7 +63,7 @@
 
     <!-- Categories Section -->
     <div class="mb-12">
-        <h2 class="text-3xl font-bold mb-6">Browse by Category</h2>
+        <h2 class="text-3xl font-bold mb-6">Phân loại</h2>
         <div id="categories-container" class="grid gap-4 md:grid-cols-4 grid-rows-2">
             {{ range $name, $taxonomy := .Site.Taxonomies.categories }}
             <a href="/categories/{{ $name | urlize }}" class="category-item bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow hidden">
@@ -131,7 +131,7 @@
 
     <!-- Authors Section -->
     <div class="mb-12">
-        <h2 class="text-3xl font-bold mb-6">Our Authors</h2>
+        <h2 class="text-3xl font-bold mb-6">Tác giả</h2>
         <div class="grid gap-6 md:grid-cols-3">
             {{ $authors := slice }}
             {{ range (where .Site.RegularPages "Type" "articles") }}
@@ -164,7 +164,7 @@
                         <span class="text-gray-600">{{ len $authorPosts }} {{ if eq (len $authorPosts) 1 }}article{{ else }}articles{{ end }}</span>
                     </div>
                     <div class="mb-4">
-                        <h4 class="text-sm font-medium text-gray-600 mb-2">Recent Articles:</h4>
+                        <h4 class="text-sm font-medium text-gray-600 mb-2">Các tin gần đây:</h4>
                         <ul class="text-sm space-y-1">
                             {{ range first 2 $authorPosts }}
                             <li><a href="{{ .RelPermalink }}" class="text-blue-600 hover:text-blue-800">{{ .Title }}</a></li>
@@ -181,7 +181,7 @@
     <!-- View All Articles Link -->
     <div class="text-center">
         <a href="/articles" class="inline-block bg-gray-800 text-white px-8 py-3 rounded-md hover:bg-gray-700">
-            View All Articles
+            Xem tất cả các tin tức
         </a>
     </div>
 </div>

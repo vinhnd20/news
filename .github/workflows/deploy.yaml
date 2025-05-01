@@ -1,54 +1,59 @@
-name: Deploy Hugo site to GitHub Pages
+name: Build and Deploy Docker Image
 
 on:
   push:
     branches:
       - main
+  schedule:
+    - cron: "0 0 1 * *"
 
 jobs:
-  build-deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          submodules: true # Fetch Hugo themes (submodules)
+          submodules: true
 
-      - name: Cache Hugo resources
-        uses: actions/cache@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          path: |
-            resources/
-            .hugo_build.lock
-          key: ${{ runner.os }}-hugo-${{ hashFiles('**/hugo.toml', '**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-hugo-
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Cache node_modules
-        if: hashFiles('package.json') != ''
-        uses: actions/cache@v3
+      - name: Build and push
+        uses: docker/build-push-action@v6
         with:
-          path: node_modules/
-          key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          context: .
+          file: cicd/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/news:latest
 
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v2
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          hugo-version: "latest" # Use the latest Hugo version
-          extended: true # Use Hugo extended for SCSS/SASS
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKER_USERNAME }}/news:latest
+            docker stop news || true
+            docker rm news || true
+            docker run -d --name news -p 80:80 -p 443:443 \
+              -v /etc/letsencrypt/live/fastcoin.click:/etc/letsencrypt/live/fastcoin.click \
+              ${{ secrets.DOCKER_USERNAME }}/news:latest
 
-      - name: Install npm dependencies
-        if: hashFiles('package.json') != ''
-        run: npm install
-
-      - name: Build
-        run: hugo --minify # Build Hugo site with minification
-
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Renew SSL Certificate
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          personal_token: ${{ secrets.DEPLOY_TOKEN }} # Use DEPLOY_TOKEN secret
-          publish_dir: ./public # Deploy the public directory
-          cname: vinhd.shop # Set custom domain
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            certbot renew --quiet
+            docker restart news
