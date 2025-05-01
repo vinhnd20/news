@@ -45,5 +45,8 @@ jobs:
             # Tạo network nếu chưa có
             docker network create traefik-net || true
 
-            # Chạy docker-compose để cập nhật container
-            docker-compose up -d --pull always
+            # Build image từ Dockerfile
+            docker-compose build
+
+            # Chạy docker-compose để khởi động container
+            docker-compose up -d
