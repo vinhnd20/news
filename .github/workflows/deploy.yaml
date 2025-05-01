@@ -24,14 +24,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Traefik
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: cicd/traefik/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/traefik:v2.10
-
       - name: Build and push Hugo News
         uses: docker/build-push-action@v6
         with:
