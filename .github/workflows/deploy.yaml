@@ -41,9 +41,27 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # Dừng Nginx hệ thống nếu đang chạy
+            sudo systemctl stop nginx || true
+            sudo systemctl disable nginx || true
+
+            # Kiểm tra và dừng container nếu tồn tại
+            if docker ps -q --filter "name=news" | grep -q .; then
+              docker stop news
+            fi
+            if docker ps -a -q --filter "name=news" | grep -q .; then
+              docker rm news
+            fi
+
+            # Kiểm tra cổng 80 và 443
+            if sudo netstat -tuln | grep ':80\|:443' | grep -q .; then
+              echo "Port 80 or 443 is in use, attempting to free..."
+              sudo fuser -k 80/tcp || true
+              sudo fuser -k 443/tcp || true
+            fi
+
+            # Pull và chạy container
             docker pull ${{ secrets.DOCKER_USERNAME }}/news:latest
-            docker stop news || true
-            docker rm news || true
             docker run -d --name news -p 80:80 -p 443:443 \
               -v /etc/letsencrypt/live/fastcoin.click:/etc/letsencrypt/live/fastcoin.click \
               ${{ secrets.DOCKER_USERNAME }}/news:latest
