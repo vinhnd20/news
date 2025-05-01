@@ -42,7 +42,8 @@ jobs:
             # Di chuyển đến thư mục chứa docker-compose.yml
             cd $HOME/hugo-news-site/cicd
 
+            # Tạo network nếu chưa có
+            docker network create traefik-net || true
+
             # Chạy docker-compose để cập nhật container
-            docker-compose down
-            docker-compose pull
-            docker-compose up -d
+            docker-compose up -d --pull always
