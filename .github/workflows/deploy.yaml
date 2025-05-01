@@ -56,8 +56,5 @@ jobs:
             # Chạy docker-compose để khởi động container
             docker-compose up -d --remove-orphans
 
-            # Làm sạch hệ thống
-            docker system prune -f --volumes
-
             # Kiểm tra trạng thái container
             docker ps
