@@ -1,0 +1,7 @@
+baseURL = 'https://vinhd.shop/'
+languageCode = 'en-us'
+title = 'My New Hugo Site'
+theme = "hugo-news"
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
