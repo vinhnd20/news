@@ -30,7 +30,9 @@ jobs:
           context: .
           file: cicd/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/news:latest
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/news:latest
+            ${{ secrets.DOCKER_USERNAME }}/news:1.${{ github.run_number }}
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@v1.0.3
@@ -45,8 +47,14 @@ jobs:
             # Tạo network nếu chưa có
             docker network create traefik-net || true
 
-            # Build image từ Dockerfile
-            docker-compose build
+            # Xóa container cũ
+            docker-compose rm -f
+
+            # Kéo image mới nhất
+            docker-compose pull
 
             # Chạy docker-compose để khởi động container
-            docker-compose up -d
+            docker-compose up -d --remove-orphans
+
+            # (Tùy chọn) Làm sạch hệ thống để tiết kiệm dung lượng
+            docker system prune -f --volumes
