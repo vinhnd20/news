@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-  schedule:
-    - cron: "0 0 1 * *"
 
 jobs:
   build-and-deploy:
@@ -26,7 +24,15 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push
+      - name: Build and push Traefik
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: cicd/traefik/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/traefik:v2.10
+
+      - name: Build and push Hugo News
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -41,37 +47,10 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Dừng Nginx hệ thống nếu đang chạy
-            sudo systemctl stop nginx || true
-            sudo systemctl disable nginx || true
+            # Di chuyển đến thư mục chứa docker-compose.yml
+            cd $HOME/hugo-news-site/cicd
 
-            # Kiểm tra và dừng container nếu tồn tại
-            if docker ps -q --filter "name=news" | grep -q .; then
-              docker stop news
-            fi
-            if docker ps -a -q --filter "name=news" | grep -q .; then
-              docker rm news
-            fi
-
-            # Kiểm tra cổng 80 và 443
-            if sudo netstat -tuln | grep ':80\|:443' | grep -q .; then
-              echo "Port 80 or 443 is in use, attempting to free..."
-              sudo fuser -k 80/tcp || true
-              sudo fuser -k 443/tcp || true
-            fi
-
-            # Pull và chạy container
-            docker pull ${{ secrets.DOCKER_USERNAME }}/news:latest
-            docker run -d --name news -p 80:80 -p 443:443 \
-              -v /etc/letsencrypt/live/fastcoin.click:/etc/letsencrypt/live/fastcoin.click \
-              ${{ secrets.DOCKER_USERNAME }}/news:latest
-
-      - name: Renew SSL Certificate
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            certbot renew --quiet
-            docker restart news
+            # Chạy docker-compose để cập nhật container
+            docker-compose down
+            docker-compose pull
+            docker-compose up -d

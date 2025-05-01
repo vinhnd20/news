@@ -3,9 +3,8 @@ WORKDIR /site
 COPY . .
 RUN hugo --minify
 
-FROM nginx:alpine
-COPY --from=builder /site/public /usr/share/nginx/html
-COPY cicd/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+FROM klakegg/hugo:latest
+WORKDIR /site
+COPY --from=builder /site/public /site/public
 EXPOSE 80
-EXPOSE 443
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["hugo", "server", "--bind", "0.0.0.0", "--port", "80", "--baseURL", "/", "--appendPort=false"]
