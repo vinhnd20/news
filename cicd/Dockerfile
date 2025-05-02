@@ -1,7 +1,7 @@
 FROM alpine:3.18 AS build
 
 # Cài Hugo phiên bản cụ thể, không cache
-RUN apk add --no-cache hugo=0.91.2-r0
+RUN apk add --update hugo
 
 WORKDIR /opt/HugoApp
 
