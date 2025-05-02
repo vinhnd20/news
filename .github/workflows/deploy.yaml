@@ -43,7 +43,6 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-
             # Di chuyển đến thư mục chứa docker-compose.yml
             cd $HOME/hugo-news-site/cicd
 
@@ -56,5 +55,19 @@ jobs:
             # Xóa image cũ không dùng
             docker image prune -f
 
+            # Chờ container khởi động
+            sleep 5
+
             # Kiểm tra trạng thái container
+            echo "Checking container status..."
+            if [ "$(docker ps -q -f name=cicd_hugo-website_1)" ]; then
+              echo "Container cicd_hugo-website_1 is running."
+            else
+              echo "Error: Container cicd_hugo-website_1 is not running!"
+              docker ps -a  # Hiển thị tất cả container, bao gồm đã dừng
+              docker logs cicd_hugo-website_1  # Hiển thị log để debug
+              exit 1  # Làm pipeline thất bại
+            fi
+
+            # Kiểm tra trạng thái container chi tiết
             docker ps
