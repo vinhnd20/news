@@ -2,7 +2,7 @@ baseURL = "https://tintuc24h.space/"
 languageCode = 'vi'
 title = 'Tin Tức 24h'
 theme = "hugo-news"
-
+buildFuture = true
 # Google Analytics 4 - Just add your G-XXXXXXXXXX ID here
 googleAnalytics = "" # e.g. "G-MEASUREMENT_ID"
 
