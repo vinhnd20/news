@@ -60,12 +60,12 @@ jobs:
 
             # Kiểm tra trạng thái container
             echo "Checking container status..."
-            if [ "$(docker ps -q -f name=cicd_hugo-website_1)" ]; then
-              echo "Container cicd_hugo-website_1 is running."
+            if [ "$(docker ps -q -f name=cicd-hugo-website_1)" ]; then
+              echo "Container cicd-hugo-website_1 is running."
             else
-              echo "Error: Container cicd_hugo-website_1 is not running!"
+              echo "Error: Container cicd-hugo-website_1 is not running!"
               docker ps -a  # Hiển thị tất cả container, bao gồm đã dừng
-              docker logs cicd_hugo-website_1  # Hiển thị log để debug
+              docker logs cicd-hugo-website_1  # Hiển thị log để debug
               exit 1  # Làm pipeline thất bại
             fi
 
