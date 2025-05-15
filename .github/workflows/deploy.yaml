@@ -47,10 +47,10 @@ jobs:
             cd $HOME/hugo-news-site/cicd
 
             # Pull image mới nhất
-            docker-compose pull
+            docker compose pull
 
             # Chạy docker-compose
-            docker-compose up -d --remove-orphans
+            docker compose up -d --remove-orphans
 
             # Xóa image cũ không dùng
             docker image prune -f
